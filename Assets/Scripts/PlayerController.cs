@@ -1,17 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     private float speed = 175.0f;
     private float zBound = 6;
     private Rigidbody playerRb;
+    private int count;
+    public Text countText;
+    public Text gameoverText;
+
 
     // Start is called before the first frame update
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
+        count = 0;
+        SetCountText();
+        gameoverText.text = "";
     }
 
     // Update is called once per frame
@@ -19,6 +28,21 @@ public class PlayerController : MonoBehaviour
     {
         MovePLayer();
         ConstrainPlayerPosition();
+    }
+
+    void SetCountText()
+    {
+        countText.text = "Score: " + count.ToString();
+    }
+
+    void GameoverText()
+    {
+        gameoverText.text = "GAME OVER, YOU LOSE!";
+    }
+
+    void GameoverDelay()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     void MovePLayer()
@@ -46,7 +70,10 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            Debug.Log("Player has collided with an enemy");
+            Debug.Log("Player has collided with an enemy, Game Over.. RESTARTING...");
+            GameoverText();
+            Invoke("GameoverDelay", 4);
+
         }
 
 
@@ -57,6 +84,9 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Powerup"))
         {
             Destroy(other.gameObject);
+            other.gameObject.SetActive(false);
+            count = count + 1;
+            SetCountText();
         }
     }
 }   
